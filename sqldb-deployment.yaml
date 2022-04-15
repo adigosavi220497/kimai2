@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sqldb
+  name: sqldb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sqldb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sqldb
+    spec:
+      containers:
+        - args:
+            - --default-storage-engine
+            - innodb
+          env:
+            - name: MYSQL_DATABASE
+              value: kimai
+            - name: MYSQL_PASSWORD
+              value: kimaipassword
+            - name: MYSQL_ROOT_PASSWORD
+              value: changemeplease
+            - name: MYSQL_USER
+              value: kimaiuser
+          image: mysql:5.7
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin -p$MYSQL_ROOT_PASSWORD ping -h localhost
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 10
+          name: sqldb
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql
+      restartPolicy: Always
+      volumes:
+        - name: mysql
+          persistentVolumeClaim:
+            claimName: mysql
+status: {}

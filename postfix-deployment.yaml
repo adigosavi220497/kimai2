@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: postfix
+  name: postfix
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: postfix
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postfix
+    spec:
+      containers:
+        - env:
+            - name: maildomain
+              value: neontribe.co.uk
+            - name: smtp_user
+              value: kimai:kimai
+          image: catatnight/postfix:latest
+          name: postfix
+          resources: {}
+      restartPolicy: Always
+status: {}
